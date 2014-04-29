@@ -46,13 +46,32 @@ class Curve25519
         ];
     }
 
+    function scalarmult(array $n, array $p)
+    {
+        return [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+    }
+
+    function clamp(array &$key)
+    {
+        $key[0] &= 0xfff8;
+        $key[15] = ($key[15] & 0x7fff) | 0x4000;
+    }
+
     function getPublic($secret)
     {
         if (!is_string($secret) || strlen($secret) !== 32) {
             throw new InvalidArgumentException('Secret must be a 32 byte string');
         }
 
-        return '';
+        $n = array_values(unpack('v16', $secret));
+        $p = [9,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+
+        $this->clamp($n);
+
+        $q = $this->scalarmult($n, $p);
+        array_unshift($q, 'v16');
+
+        return call_user_func_array('pack', $q);
     }
 
     function getShared($secret, $public)
@@ -65,7 +84,15 @@ class Curve25519
             throw new InvalidArgumentException('Public must be a 32 byte string');
         }
 
-        return '';
+        $n = array_values(unpack('v16', $secret));
+        $p = array_values(unpack('v16', $public));
+
+        $this->clamp($n);
+
+        $q = $this->scalarmult($n, $p);
+        array_unshift($q, 'v16');
+
+        return call_user_func_array('pack', $q);
     }
 } 
 

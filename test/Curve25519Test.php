@@ -60,6 +60,27 @@ class Curve25519Test extends PHPUnit_Framework_TestCase
         );
     }
 
+    function testClamp()
+    {
+        $curve25519 = new Curve25519();
+
+        $key = array_fill(0, 16, 0xffff);
+        $curve25519->clamp($key);
+
+        $this->assertSame(
+            [0xfff8,0xffff,0xffff,0xffff, 0xffff,0xffff,0xffff,0xffff, 0xffff,0xffff,0xffff,0xffff, 0xffff,0xffff,0xffff,0x7fff],
+            $key
+        );
+
+        $key = array_fill(0, 16, 7);
+        $curve25519->clamp($key);
+
+        $this->assertSame(
+            [0,7,7,7, 7,7,7,7, 7,7,7,7, 7,7,7,0x4007],
+            $key
+        );
+    }
+
     /**
      * @expectedException InvalidArgumentException
      */
