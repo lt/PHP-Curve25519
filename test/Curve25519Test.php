@@ -2,6 +2,22 @@
 
 class Curve25519Test extends PHPUnit_Framework_TestCase
 {
+    function testOverall()
+    {
+        $curve25519 = new Curve25519();
+
+        $secret1 = str_repeat('a', 32);
+        $secret2 = str_repeat('b', 32);
+
+        $public1 = $curve25519->getPublic($secret1);
+        $public2 = $curve25519->getPublic($secret2);
+
+        $shared1 = $curve25519->getShared($secret1, $public2);
+        $shared2 = $curve25519->getShared($secret2, $public1);
+
+        $this->assertSame($shared1, $shared2);
+    }
+
     function testAddModP()
     {
         $curve25519 = new Curve25519();
@@ -56,6 +72,46 @@ class Curve25519Test extends PHPUnit_Framework_TestCase
             $curve25519->sub(
                 [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0],
                 [1,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0]
+            )
+        );
+    }
+
+    function testMulModP()
+    {
+        $curve25519 = new Curve25519();
+
+        $this->assertSame(
+            [571, 534, 497, 460, 423, 386, 349, 312, 275, 238, 201, 164, 127, 90, 53, 16],
+            $curve25519->mul(
+                [1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1],
+                [1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1]
+            )
+        );
+
+        $this->assertSame(
+            [1350, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32768],
+            $curve25519->mul(
+                [0xffff,0xffff,0xffff,0xffff, 0xffff,0xffff,0xffff,0xffff, 0xffff,0xffff,0xffff,0xffff, 0xffff,0xffff,0xffff,0xffff],
+                [0xffff,0xffff,0xffff,0xffff, 0xffff,0xffff,0xffff,0xffff, 0xffff,0xffff,0xffff,0xffff, 0xffff,0xffff,0xffff,0xffff]
+            )
+        );
+    }
+
+    function testSqrModP()
+    {
+        $curve25519 = new Curve25519();
+
+        $this->assertSame(
+            [571, 534, 497, 460, 423, 386, 349, 312, 275, 238, 201, 164, 127, 90, 53, 16],
+            $curve25519->sqr(
+                [1,1,1,1, 1,1,1,1, 1,1,1,1, 1,1,1,1]
+            )
+        );
+
+        $this->assertSame(
+            [1350, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 32768],
+            $curve25519->sqr(
+                [0xffff,0xffff,0xffff,0xffff, 0xffff,0xffff,0xffff,0xffff, 0xffff,0xffff,0xffff,0xffff, 0xffff,0xffff,0xffff,0xffff]
             )
         );
     }

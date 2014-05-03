@@ -97,9 +97,52 @@ class Curve25519
         ]);
     }
 
+    function sqrHalf($a7, $a6, $a5, $a4, $a3, $a2, $a1, $a0)
+    {
+        return [
+            ($carry = $a0*$a0) & 0xffff,
+            ($carry = ($carry >> 16) + $a0*$a1*2) & 0xffff,
+            ($carry = ($carry >> 16) + $a0*$a2*2 + $a1*$a1) & 0xffff,
+            ($carry = ($carry >> 16) + $a0*$a3*2 + $a1*$a2*2) & 0xffff,
+            ($carry = ($carry >> 16) + $a0*$a4*2 + $a1*$a3*2 + $a2*$a2) & 0xffff,
+            ($carry = ($carry >> 16) + $a0*$a5*2 + $a1*$a4*2 + $a2*$a3*2) & 0xffff,
+            ($carry = ($carry >> 16) + $a0*$a6*2 + $a1*$a5*2 + $a2*$a4*2 + $a3*$a3) & 0xffff,
+            ($carry = ($carry >> 16) + $a0*$a7*2 + $a1*$a6*2 + $a2*$a5*2 + $a3*$a4*2) & 0xffff,
+            ($carry = ($carry >> 16) + $a1*$a7*2 + $a2*$a6*2 + $a3*$a5*2 + $a4*$a4) & 0xffff,
+            ($carry = ($carry >> 16) + $a2*$a7*2 + $a3*$a6*2 + $a4*$a5*2) & 0xffff,
+            ($carry = ($carry >> 16) + $a3*$a7*2 + $a4*$a6*2 + $a5*$a5) & 0xffff,
+            ($carry = ($carry >> 16) + $a4*$a7*2 + $a5*$a6*2) & 0xffff,
+            ($carry = ($carry >> 16) + $a5*$a7*2 + $a6*$a6) & 0xffff,
+            ($carry = ($carry >> 16) + $a6*$a7*2) & 0xffff,
+            ($carry = ($carry >> 16) + $a7*$a7) & 0xffff,
+                       $carry >> 16
+        ];
+    }
+
     function sqr(array $a)
     {
-        return $this->mul($a, $a);
+        $d = $this->sqrHalf($a[15], $a[14], $a[13], $a[12], $a[11], $a[10], $a[ 9], $a[ 8]);
+        $e = $this->sqrHalf($a[ 7], $a[ 6], $a[ 5], $a[ 4], $a[ 3], $a[ 2], $a[ 1], $a[ 0]);
+        $f = $this->sqrHalf($a[15] + $a[7], $a[14] + $a[6], $a[13] + $a[5], $a[12] + $a[4], $a[11] + $a[3], $a[10] + $a[2], $a[9] + $a[1], $a[8] + $a[0]);
+
+        return $this->reduce([
+            ($carry = 0x800000                  + $e[ 0] + ($f[ 8] - $d[ 8] - $e[ 8] + $d[ 0] -0x80) * 38) & 0xffff,
+            ($carry = 0x7fff80 + ($carry >> 16) + $e[ 1] + ($f[ 9] - $d[ 9] - $e[ 9] + $d[ 1]) * 38) & 0xffff,
+            ($carry = 0x7fff80 + ($carry >> 16) + $e[ 2] + ($f[10] - $d[10] - $e[10] + $d[ 2]) * 38) & 0xffff,
+            ($carry = 0x7fff80 + ($carry >> 16) + $e[ 3] + ($f[11] - $d[11] - $e[11] + $d[ 3]) * 38) & 0xffff,
+            ($carry = 0x7fff80 + ($carry >> 16) + $e[ 4] + ($f[12] - $d[12] - $e[12] + $d[ 4]) * 38) & 0xffff,
+            ($carry = 0x7fff80 + ($carry >> 16) + $e[ 5] + ($f[13] - $d[13] - $e[13] + $d[ 5]) * 38) & 0xffff,
+            ($carry = 0x7fff80 + ($carry >> 16) + $e[ 6] + ($f[14] - $d[14] - $e[14] + $d[ 6]) * 38) & 0xffff,
+            ($carry = 0x7fff80 + ($carry >> 16) + $e[ 7] + ($f[15] - $d[15] - $e[15] + $d[ 7]) * 38) & 0xffff,
+            ($carry = 0x7fff80 + ($carry >> 16) + $e[ 8] +  $f[ 0] - $d[ 0] - $e[ 0] + $d[ 8]  * 38) & 0xffff,
+            ($carry = 0x7fff80 + ($carry >> 16) + $e[ 9] +  $f[ 1] - $d[ 1] - $e[ 1] + $d[ 9]  * 38) & 0xffff,
+            ($carry = 0x7fff80 + ($carry >> 16) + $e[10] +  $f[ 2] - $d[ 2] - $e[ 2] + $d[10]  * 38) & 0xffff,
+            ($carry = 0x7fff80 + ($carry >> 16) + $e[11] +  $f[ 3] - $d[ 3] - $e[ 3] + $d[11]  * 38) & 0xffff,
+            ($carry = 0x7fff80 + ($carry >> 16) + $e[12] +  $f[ 4] - $d[ 4] - $e[ 4] + $d[12]  * 38) & 0xffff,
+            ($carry = 0x7fff80 + ($carry >> 16) + $e[13] +  $f[ 5] - $d[ 5] - $e[ 5] + $d[13]  * 38) & 0xffff,
+            ($carry = 0x7fff80 + ($carry >> 16) + $e[14] +  $f[ 6] - $d[ 6] - $e[ 6] + $d[14]  * 38) & 0xffff,
+                      0x7fff80 + ($carry >> 16) + $e[15] +  $f[ 7] - $d[ 7] - $e[ 7] + $d[15]  * 38
+        ]);
     }
 
     function mul121665(array $a)
@@ -127,22 +170,31 @@ class Curve25519
     function inv(array $a)
     {
         $c = $a;
+
         $i = 250;
         while (--$i) {
             $a = $this->sqr($a);
             $a = $this->mul($a, $c);
         }
+
         $a = $this->sqr($a);
-        $a = $this->sqr($a); $a = $this->mul($a, $c);
         $a = $this->sqr($a);
-        $a = $this->sqr($a); $a = $this->mul($a, $c);
-        $a = $this->sqr($a); $a = $this->mul($a, $c);
+        $a = $this->mul($a, $c);
+
+        $a = $this->sqr($a);
+        $a = $this->sqr($a);
+        $a = $this->mul($a, $c);
+
+        $a = $this->sqr($a);
+        $a = $this->mul($a, $c);
+
         return $a;
     }
 
     function reduce(array $a)
     {
         $carry2 = ($carry = $a[15]) & 0x7fff;
+
         $r = [
             ($carry = ($carry >> 15) * 19 + $a[0]) & 0xffff,
             ($carry = ($carry >> 16) + $a[ 1]) & 0xffff,
@@ -161,6 +213,7 @@ class Curve25519
             ($carry = ($carry >> 16) + $a[14]) & 0xffff,
                       ($carry >> 16) + $carry2
         ];
+
         return $r;
     }
 
@@ -169,45 +222,47 @@ class Curve25519
         $m = $this->sqr($this->add($x, $z));
         $n = $this->sqr($this->sub($x, $z));
         $o = $this->sub($m, $n);
-        $x_2 = $this->mul($n, $m);
-        $z_2 = $this->mul($this->add($this->mul121665($o), $m), $o);
-        return [$x_2, $z_2];
+        $x2 = $this->mul($n, $m);
+        $z2 = $this->mul($this->add($this->mul121665($o), $m), $o);
+
+        return [$x2, $z2];
     }
 
-    function sum($x, $z, $x_p, $z_p, $x_1)
+    function sum($x, $z, $xp, $zp, $x1)
     {
-        $p = $this->mul($this->sub($x, $z), $this->add($x_p, $z_p));
-        $q = $this->mul($this->add($x, $z), $this->sub($x_p, $z_p));
-        $x_3 = $this->sqr($this->add($p, $q));
-        $z_3 = $this->mul($this->sqr($this->sub($p, $q)), $x_1);
-        return [$x_3, $z_3];
+        $p = $this->mul($this->sub($x, $z), $this->add($xp, $zp));
+        $q = $this->mul($this->add($x, $z), $this->sub($xp, $zp));
+        $x3 = $this->sqr($this->add($p, $q));
+        $z3 = $this->mul($this->sqr($this->sub($p, $q)), $x1);
+
+        return [$x3, $z3];
     }
 
     function scalarmult(array $f, array $c)
     {
-        $x_1 = $c;
-        $a = $this->dbl($x_1, $this->one);
-        $q = [$x_1, $this->one];
+        $x1 = $c;
+        $a = $this->dbl($x1, $this->one);
+        $q = [$x1, $this->one];
 
         $n = 0xff;
 
-        while (1 & $f[$n >> 4] >> ($n & 0xf) === 0) {
+        while ($f[$n >> 4] >> ($n & 0xf) & 1 === 0) {
             $n--;
-            // For correct constant-time operation, $bit 255 should always be set to 1 so the following 'while' loop is never entered
+
             if ($n < 0) {
                 return $this->zero;
             }
         }
         $n--;
 
-        $aq = [ $a, $q ];
+        $aq = [$a, $q];
 
         while ($n >= 0) {
-            $b = 1 & $f[$n >> 4] >> ($n & 0xf);
-            $r = $this->sum($aq[0][0], $aq[0][1], $aq[1][0], $aq[1][1], $x_1);
-            $s = $this->dbl($aq[1-$b][0], $aq[1-$b][1]);
-            $aq[1-$b]  = $s;
-            $aq[$b]    = $r;
+            $b = $f[$n >> 4] >> ($n & 0xf) & 1;
+            $r = $this->sum($aq[0][0], $aq[0][1], $aq[1][0], $aq[1][1], $x1);
+            $s = $this->dbl($aq[1 - $b][0], $aq[1 - $b][1]);
+            $aq[1 - $b] = $s;
+            $aq[    $b] = $r;
             $n--;
         }
         $q = $aq[1];
@@ -217,10 +272,10 @@ class Curve25519
         return $this->reduce($q[0]);
     }
 
-    function clamp(array &$key)
+    function clamp(array &$secret)
     {
-        $key[0] &= 0xfff8;
-        $key[15] = ($key[15] & 0x7fff) | 0x4000;
+        $secret[0] &= 0xfff8;
+        $secret[15] = ($secret[15] & 0x7fff) | 0x4000;
     }
 
     function getPublic($secret)
@@ -234,9 +289,8 @@ class Curve25519
         $this->clamp($n);
 
         $q = $this->scalarmult($n, $this->nine);
-        array_unshift($q, 'v16');
 
-        return call_user_func_array('pack', $q);
+        return pack('v16', $q[0], $q[1], $q[2], $q[3], $q[4], $q[5], $q[6], $q[7], $q[8], $q[9], $q[10], $q[11], $q[12], $q[13], $q[14], $q[15]);
     }
 
     function getShared($secret, $public)
@@ -255,9 +309,8 @@ class Curve25519
         $this->clamp($n);
 
         $q = $this->scalarmult($n, $p);
-        array_unshift($q, 'v16');
 
-        return call_user_func_array('pack', $q);
+        return pack('v16', $q[0], $q[1], $q[2], $q[3], $q[4], $q[5], $q[6], $q[7], $q[8], $q[9], $q[10], $q[11], $q[12], $q[13], $q[14], $q[15]);
     }
 }
 
