@@ -2,280 +2,228 @@
 
 class Curve25519
 {
-    private $zero = [0,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0];
-    private $one  = [1,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0];
-    private $nine = [9,0,0,0, 0,0,0,0, 0,0,0,0, 0,0,0,0];
+    private $zero = [0,0,0,0, 0,0,0,0, 0,0];
+    private $one  = [1,0,0,0, 0,0,0,0, 0,0];
+    private $nine = [9,0,0,0, 0,0,0,0, 0,0];
 
-    function add(array $a, array $b)
-    {
+    function add($a, $b) {
         return [
-            ($carry = (($a[15] >> 15) + ($b[15] >> 15)) * 19 + $a[0] + $b[0]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[ 1] + $b[ 1]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[ 2] + $b[ 2]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[ 3] + $b[ 3]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[ 4] + $b[ 4]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[ 5] + $b[ 5]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[ 6] + $b[ 6]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[ 7] + $b[ 7]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[ 8] + $b[ 8]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[ 9] + $b[ 9]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[10] + $b[10]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[11] + $b[11]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[12] + $b[12]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[13] + $b[13]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[14] + $b[14]) & 0xffff,
-                      ($carry >> 16) + ($a[15] & 0x7fff) + ($b[15] & 0x7fff)
+            $a[0] + $b[0], $a[1] + $b[1], $a[2] + $b[2], $a[3] + $b[3], $a[4] + $b[4],
+            $a[5] + $b[5], $a[6] + $b[6], $a[7] + $b[7], $a[8] + $b[8], $a[9] + $b[9]
         ];
     }
 
-    function sub(array $a, array $b)
-    {
-        return [
-            ($carry = 0x80000 + (($a[15] >> 15) - ($b[15] >> 15) - 1) * 19 + $a[0] - $b[0]) & 0xffff,
-            ($carry = ($carry >> 16) + 0x7fff8 + $a[ 1] - $b[ 1]) & 0xffff,
-            ($carry = ($carry >> 16) + 0x7fff8 + $a[ 2] - $b[ 2]) & 0xffff,
-            ($carry = ($carry >> 16) + 0x7fff8 + $a[ 3] - $b[ 3]) & 0xffff,
-            ($carry = ($carry >> 16) + 0x7fff8 + $a[ 4] - $b[ 4]) & 0xffff,
-            ($carry = ($carry >> 16) + 0x7fff8 + $a[ 5] - $b[ 5]) & 0xffff,
-            ($carry = ($carry >> 16) + 0x7fff8 + $a[ 6] - $b[ 6]) & 0xffff,
-            ($carry = ($carry >> 16) + 0x7fff8 + $a[ 7] - $b[ 7]) & 0xffff,
-            ($carry = ($carry >> 16) + 0x7fff8 + $a[ 8] - $b[ 8]) & 0xffff,
-            ($carry = ($carry >> 16) + 0x7fff8 + $a[ 9] - $b[ 9]) & 0xffff,
-            ($carry = ($carry >> 16) + 0x7fff8 + $a[10] - $b[10]) & 0xffff,
-            ($carry = ($carry >> 16) + 0x7fff8 + $a[11] - $b[11]) & 0xffff,
-            ($carry = ($carry >> 16) + 0x7fff8 + $a[12] - $b[12]) & 0xffff,
-            ($carry = ($carry >> 16) + 0x7fff8 + $a[13] - $b[13]) & 0xffff,
-            ($carry = ($carry >> 16) + 0x7fff8 + $a[14] - $b[14]) & 0xffff,
-                      ($carry >> 16) + 0x7ff8 + ($a[15] & 0x7fff) - ($b[15] & 0x7fff)
-        ];
-    }
-
-    function mulHalf($a7, $a6, $a5, $a4, $a3, $a2, $a1, $a0, $b7, $b6, $b5, $b4, $b3, $b2, $b1, $b0)
-    {
-        return [
-            ($carry = $a0*$b0) & 0xffff,
-            ($carry = ($carry >> 16) + $a0*$b1 + $a1*$b0) & 0xffff,
-            ($carry = ($carry >> 16) + $a0*$b2 + $a1*$b1 + $a2*$b0) & 0xffff,
-            ($carry = ($carry >> 16) + $a0*$b3 + $a1*$b2 + $a2*$b1 + $a3*$b0) & 0xffff,
-            ($carry = ($carry >> 16) + $a0*$b4 + $a1*$b3 + $a2*$b2 + $a3*$b1 + $a4*$b0) & 0xffff,
-            ($carry = ($carry >> 16) + $a0*$b5 + $a1*$b4 + $a2*$b3 + $a3*$b2 + $a4*$b1 + $a5*$b0) & 0xffff,
-            ($carry = ($carry >> 16) + $a0*$b6 + $a1*$b5 + $a2*$b4 + $a3*$b3 + $a4*$b2 + $a5*$b1 + $a6*$b0) & 0xffff,
-            ($carry = ($carry >> 16) + $a0*$b7 + $a1*$b6 + $a2*$b5 + $a3*$b4 + $a4*$b3 + $a5*$b2 + $a6*$b1 + $a7*$b0) & 0xffff,
-            ($carry = ($carry >> 16) + $a1*$b7 + $a2*$b6 + $a3*$b5 + $a4*$b4 + $a5*$b3 + $a6*$b2 + $a7*$b1) & 0xffff,
-            ($carry = ($carry >> 16) + $a2*$b7 + $a3*$b6 + $a4*$b5 + $a5*$b4 + $a6*$b3 + $a7*$b2) & 0xffff,
-            ($carry = ($carry >> 16) + $a3*$b7 + $a4*$b6 + $a5*$b5 + $a6*$b4 + $a7*$b3) & 0xffff,
-            ($carry = ($carry >> 16) + $a4*$b7 + $a5*$b6 + $a6*$b5 + $a7*$b4) & 0xffff,
-            ($carry = ($carry >> 16) + $a5*$b7 + $a6*$b6 + $a7*$b5) & 0xffff,
-            ($carry = ($carry >> 16) + $a6*$b7 + $a7*$b6) & 0xffff,
-            ($carry = ($carry >> 16) + $a7*$b7) & 0xffff,
-                       $carry >> 16
-        ];
-    }
-
-    function mul(array $a, array $b) {
-        $d = $this->mulHalf($a[15], $a[14], $a[13], $a[12], $a[11], $a[10], $a[ 9], $a[ 8], $b[15], $b[14], $b[13], $b[12], $b[11], $b[10], $b[ 9], $b[ 8]);
-        $e = $this->mulHalf($a[ 7], $a[ 6], $a[ 5], $a[ 4], $a[ 3], $a[ 2], $a[ 1], $a[ 0], $b[ 7], $b[ 6], $b[ 5], $b[ 4], $b[ 3], $b[ 2], $b[ 1], $b[ 0]);
-        $f = $this->mulHalf($a[15] + $a[7], $a[14] + $a[6], $a[13] + $a[5], $a[12] + $a[4], $a[11] + $a[3], $a[10] + $a[2], $a[9] + $a[1], $a[8] + $a[0], $b[15] + $b[7], $b[14] + $b[6], $b[13] + $b[5], $b[12] + $b[4], $b[11] + $b[3], $b[10] + $b[2], $b[9] + $b[1], $b[8] + $b[0]);
-
-        return $this->reduce([
-            ($carry = 0x800000                  + $e[ 0] + ($f[ 8] - $d[ 8] - $e[ 8] + $d[ 0] -0x80) * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[ 1] + ($f[ 9] - $d[ 9] - $e[ 9] + $d[ 1]) * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[ 2] + ($f[10] - $d[10] - $e[10] + $d[ 2]) * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[ 3] + ($f[11] - $d[11] - $e[11] + $d[ 3]) * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[ 4] + ($f[12] - $d[12] - $e[12] + $d[ 4]) * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[ 5] + ($f[13] - $d[13] - $e[13] + $d[ 5]) * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[ 6] + ($f[14] - $d[14] - $e[14] + $d[ 6]) * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[ 7] + ($f[15] - $d[15] - $e[15] + $d[ 7]) * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[ 8] +  $f[ 0] - $d[ 0] - $e[ 0] + $d[ 8]  * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[ 9] +  $f[ 1] - $d[ 1] - $e[ 1] + $d[ 9]  * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[10] +  $f[ 2] - $d[ 2] - $e[ 2] + $d[10]  * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[11] +  $f[ 3] - $d[ 3] - $e[ 3] + $d[11]  * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[12] +  $f[ 4] - $d[ 4] - $e[ 4] + $d[12]  * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[13] +  $f[ 5] - $d[ 5] - $e[ 5] + $d[13]  * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[14] +  $f[ 6] - $d[ 6] - $e[ 6] + $d[14]  * 38) & 0xffff,
-                      0x7fff80 + ($carry >> 16) + $e[15] +  $f[ 7] - $d[ 7] - $e[ 7] + $d[15]  * 38
-        ]);
-    }
-
-    function sqrHalf($a7, $a6, $a5, $a4, $a3, $a2, $a1, $a0)
-    {
-        return [
-            ($carry = $a0*$a0) & 0xffff,
-            ($carry = ($carry >> 16) + $a0*$a1*2) & 0xffff,
-            ($carry = ($carry >> 16) + $a0*$a2*2 + $a1*$a1) & 0xffff,
-            ($carry = ($carry >> 16) + $a0*$a3*2 + $a1*$a2*2) & 0xffff,
-            ($carry = ($carry >> 16) + $a0*$a4*2 + $a1*$a3*2 + $a2*$a2) & 0xffff,
-            ($carry = ($carry >> 16) + $a0*$a5*2 + $a1*$a4*2 + $a2*$a3*2) & 0xffff,
-            ($carry = ($carry >> 16) + $a0*$a6*2 + $a1*$a5*2 + $a2*$a4*2 + $a3*$a3) & 0xffff,
-            ($carry = ($carry >> 16) + $a0*$a7*2 + $a1*$a6*2 + $a2*$a5*2 + $a3*$a4*2) & 0xffff,
-            ($carry = ($carry >> 16) + $a1*$a7*2 + $a2*$a6*2 + $a3*$a5*2 + $a4*$a4) & 0xffff,
-            ($carry = ($carry >> 16) + $a2*$a7*2 + $a3*$a6*2 + $a4*$a5*2) & 0xffff,
-            ($carry = ($carry >> 16) + $a3*$a7*2 + $a4*$a6*2 + $a5*$a5) & 0xffff,
-            ($carry = ($carry >> 16) + $a4*$a7*2 + $a5*$a6*2) & 0xffff,
-            ($carry = ($carry >> 16) + $a5*$a7*2 + $a6*$a6) & 0xffff,
-            ($carry = ($carry >> 16) + $a6*$a7*2) & 0xffff,
-            ($carry = ($carry >> 16) + $a7*$a7) & 0xffff,
-                       $carry >> 16
-        ];
-    }
-
-    function sqr(array $a)
-    {
-        $d = $this->sqrHalf($a[15], $a[14], $a[13], $a[12], $a[11], $a[10], $a[ 9], $a[ 8]);
-        $e = $this->sqrHalf($a[ 7], $a[ 6], $a[ 5], $a[ 4], $a[ 3], $a[ 2], $a[ 1], $a[ 0]);
-        $f = $this->sqrHalf($a[15] + $a[7], $a[14] + $a[6], $a[13] + $a[5], $a[12] + $a[4], $a[11] + $a[3], $a[10] + $a[2], $a[9] + $a[1], $a[8] + $a[0]);
-
-        return $this->reduce([
-            ($carry = 0x800000                  + $e[ 0] + ($f[ 8] - $d[ 8] - $e[ 8] + $d[ 0] -0x80) * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[ 1] + ($f[ 9] - $d[ 9] - $e[ 9] + $d[ 1]) * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[ 2] + ($f[10] - $d[10] - $e[10] + $d[ 2]) * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[ 3] + ($f[11] - $d[11] - $e[11] + $d[ 3]) * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[ 4] + ($f[12] - $d[12] - $e[12] + $d[ 4]) * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[ 5] + ($f[13] - $d[13] - $e[13] + $d[ 5]) * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[ 6] + ($f[14] - $d[14] - $e[14] + $d[ 6]) * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[ 7] + ($f[15] - $d[15] - $e[15] + $d[ 7]) * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[ 8] +  $f[ 0] - $d[ 0] - $e[ 0] + $d[ 8]  * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[ 9] +  $f[ 1] - $d[ 1] - $e[ 1] + $d[ 9]  * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[10] +  $f[ 2] - $d[ 2] - $e[ 2] + $d[10]  * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[11] +  $f[ 3] - $d[ 3] - $e[ 3] + $d[11]  * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[12] +  $f[ 4] - $d[ 4] - $e[ 4] + $d[12]  * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[13] +  $f[ 5] - $d[ 5] - $e[ 5] + $d[13]  * 38) & 0xffff,
-            ($carry = 0x7fff80 + ($carry >> 16) + $e[14] +  $f[ 6] - $d[ 6] - $e[ 6] + $d[14]  * 38) & 0xffff,
-                      0x7fff80 + ($carry >> 16) + $e[15] +  $f[ 7] - $d[ 7] - $e[ 7] + $d[15]  * 38
-        ]);
-    }
-
-    function mul121665(array $a)
-    {
-        return $this->reduce([
-            ($carry =                  $a[ 0] * 121665) & 0xffff,
-            ($carry = ($carry >> 16) + $a[ 1] * 121665) & 0xffff,
-            ($carry = ($carry >> 16) + $a[ 2] * 121665) & 0xffff,
-            ($carry = ($carry >> 16) + $a[ 3] * 121665) & 0xffff,
-            ($carry = ($carry >> 16) + $a[ 4] * 121665) & 0xffff,
-            ($carry = ($carry >> 16) + $a[ 5] * 121665) & 0xffff,
-            ($carry = ($carry >> 16) + $a[ 6] * 121665) & 0xffff,
-            ($carry = ($carry >> 16) + $a[ 7] * 121665) & 0xffff,
-            ($carry = ($carry >> 16) + $a[ 8] * 121665) & 0xffff,
-            ($carry = ($carry >> 16) + $a[ 9] * 121665) & 0xffff,
-            ($carry = ($carry >> 16) + $a[10] * 121665) & 0xffff,
-            ($carry = ($carry >> 16) + $a[11] * 121665) & 0xffff,
-            ($carry = ($carry >> 16) + $a[12] * 121665) & 0xffff,
-            ($carry = ($carry >> 16) + $a[13] * 121665) & 0xffff,
-            ($carry = ($carry >> 16) + $a[14] * 121665) & 0xffff,
-                      ($carry >> 16) + $a[15] * 121665
-        ]);
-    }
-
-    function inv(array $a)
-    {
-        $c = $a;
-
-        $i = 250;
-        while (--$i) {
-            $a = $this->sqr($a);
-            $a = $this->mul($a, $c);
-        }
-
-        $a = $this->sqr($a);
-        $a = $this->sqr($a);
-        $a = $this->mul($a, $c);
-
-        $a = $this->sqr($a);
-        $a = $this->sqr($a);
-        $a = $this->mul($a, $c);
-
-        $a = $this->sqr($a);
-        $a = $this->mul($a, $c);
-
-        return $a;
-    }
-
-    function reduce(array $a)
-    {
-        $carry2 = ($carry = $a[15]) & 0x7fff;
-
+    function sub($a, $b) {
         $r = [
-            ($carry = ($carry >> 15) * 19 + $a[0]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[ 1]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[ 2]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[ 3]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[ 4]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[ 5]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[ 6]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[ 7]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[ 8]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[ 9]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[10]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[11]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[12]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[13]) & 0xffff,
-            ($carry = ($carry >> 16) + $a[14]) & 0xffff,
-                      ($carry >> 16) + $carry2
+            ($c = 0x7ffffda + $a[0] - $b[0]             ) & 0x3ffffff,
+            ($c = 0x3fffffe + $a[1] - $b[1] + ($c >> 26)) & 0x1ffffff,
+            ($c = 0x7fffffe + $a[2] - $b[2] + ($c >> 25)) & 0x3ffffff,
+            ($c = 0x3fffffe + $a[3] - $b[3] + ($c >> 26)) & 0x1ffffff,
+            ($c = 0x7fffffe + $a[4] - $b[4] + ($c >> 25)) & 0x3ffffff,
+            ($c = 0x3fffffe + $a[5] - $b[5] + ($c >> 26)) & 0x1ffffff,
+            ($c = 0x7fffffe + $a[6] - $b[6] + ($c >> 25)) & 0x3ffffff,
+            ($c = 0x3fffffe + $a[7] - $b[7] + ($c >> 26)) & 0x1ffffff,
+            ($c = 0x7fffffe + $a[8] - $b[8] + ($c >> 25)) & 0x3ffffff,
+            ($c = 0x3fffffe + $a[9] - $b[9] + ($c >> 26)) & 0x1ffffff,
         ];
+
+        $r[0] += 19 * ($c >> 25);
 
         return $r;
     }
 
-    function dbl($x, $z)
-    {
-        $m = $this->sqr($this->add($x, $z));
-        $n = $this->sqr($this->sub($x, $z));
-        $o = $this->sub($m, $n);
-        $x2 = $this->mul($n, $m);
-        $z2 = $this->mul($this->add($this->mul121665($o), $m), $o);
+    function mul($a, $b) {
+        list($s0, $s1, $s2, $s3, $s4, $s5, $s6, $s7, $s8, $s9) = $a;
+        list($r0, $r1, $r2, $r3, $r4, $r5, $r6, $r7, $r8, $r9) = $b;
 
-        return [$x2, $z2];
+        $r1_2 = $r1 * 2;
+        $r3_2 = $r3 * 2;
+        $r5_2 = $r5 * 2;
+
+        $r2_19 = $r2 * 19;
+        $r4_19 = $r4 * 19;
+        $r5_19 = $r5 * 19;
+        $r6_19 = $r6 * 19;
+        $r7_19 = $r7 * 19;
+        $r8_19 = $r8 * 19;
+        $r9_19 = $r9 * 19;
+
+        $r3_38 = $r3 * 38;
+        $r5_38 = $r5 * 38;
+        $r7_38 = $r7 * 38;
+        $r9_38 = $r9 * 38;
+
+        $r = [
+            ($c = $m0 = ($r0 * $s0) + ($r1 * 38 * $s9) + ($r2_19 * $s8) + ($r3_38   * $s7) + ($r4_19 * $s6) + ($r5_38 * $s5) + ($r6_19 * $s4) + ($r7_38  * $s3) + ($r8_19 * $s2) + ($r9_38 * $s1)             ) & 0x3ffffff,
+            ($c = $m1 = ($r0 * $s1) + ($r1      * $s0) + ($r2_19 * $s9) + ($r3 * 19 * $s8) + ($r4_19 * $s7) + ($r5_19 * $s6) + ($r6_19 * $s5) + ($r7_19  * $s4) + ($r8_19 * $s3) + ($r9_19 * $s2) + ($c >> 26)) & 0x1ffffff,
+            ($c = $m2 = ($r0 * $s2) + ($r1_2    * $s1) + ($r2    * $s0) + ($r3_38   * $s9) + ($r4_19 * $s8) + ($r5_38 * $s7) + ($r6_19 * $s6) + ($r7_38  * $s5) + ($r8_19 * $s4) + ($r9_38 * $s3) + ($c >> 25)) & 0x3ffffff,
+            ($c = $m3 = ($r0 * $s3) + ($r1      * $s2) + ($r2    * $s1) + ($r3      * $s0) + ($r4_19 * $s9) + ($r5_19 * $s8) + ($r6_19 * $s7) + ($r7_19  * $s6) + ($r8_19 * $s5) + ($r9_19 * $s4) + ($c >> 26)) & 0x1ffffff,
+            ($c = $m4 = ($r0 * $s4) + ($r1_2    * $s3) + ($r2    * $s2) + ($r3_2    * $s1) + ($r4    * $s0) + ($r5_38 * $s9) + ($r6_19 * $s8) + ($r7_38  * $s7) + ($r8_19 * $s6) + ($r9_38 * $s5) + ($c >> 25)) & 0x3ffffff,
+            ($c = $m5 = ($r0 * $s5) + ($r1      * $s4) + ($r2    * $s3) + ($r3      * $s2) + ($r4    * $s1) + ($r5    * $s0) + ($r6_19 * $s9) + ($r7_19  * $s8) + ($r8_19 * $s7) + ($r9_19 * $s6) + ($c >> 26)) & 0x1ffffff,
+            ($c = $m6 = ($r0 * $s6) + ($r1_2    * $s5) + ($r2    * $s4) + ($r3_2    * $s3) + ($r4    * $s2) + ($r5_2  * $s1) + ($r6    * $s0) + ($r7_38  * $s9) + ($r8_19 * $s8) + ($r9_38 * $s7) + ($c >> 25)) & 0x3ffffff,
+            ($c = $m7 = ($r0 * $s7) + ($r1      * $s6) + ($r2    * $s5) + ($r3      * $s4) + ($r4    * $s3) + ($r5    * $s2) + ($r6    * $s1) + ($r7     * $s0) + ($r8_19 * $s9) + ($r9_19 * $s8) + ($c >> 26)) & 0x1ffffff,
+            ($c = $m8 = ($r0 * $s8) + ($r1_2    * $s7) + ($r2    * $s6) + ($r3_2    * $s5) + ($r4    * $s4) + ($r5_2  * $s3) + ($r6    * $s2) + ($r7 * 2 * $s1) + ($r8    * $s0) + ($r9_38 * $s9) + ($c >> 25)) & 0x3ffffff,
+            ($c = $m9 = ($r0 * $s9) + ($r1      * $s8) + ($r2    * $s7) + ($r3      * $s6) + ($r4    * $s5) + ($r5    * $s4) + ($r6    * $s3) + ($r7     * $s2) + ($r8    * $s1) + ($r9    * $s0) + ($c >> 26)) & 0x1ffffff
+        ];
+        $r[0] += ($c = 19 * ($c >> 25)) & 0x3ffffff;
+        $r[1] +=            ($c >> 26);
+
+        return $r;
     }
 
-    function sum($x, $z, $xp, $zp, $x1)
-    {
-        $p = $this->mul($this->sub($x, $z), $this->add($xp, $zp));
-        $q = $this->mul($this->add($x, $z), $this->sub($xp, $zp));
-        $x3 = $this->sqr($this->add($p, $q));
-        $z3 = $this->mul($this->sqr($this->sub($p, $q)), $x1);
+    function sqr($a, $n = 1) {
+        list($r0, $r1, $r2, $r3, $r4, $r5, $r6, $r7, $r8, $r9) = $a;
 
-        return [$x3, $z3];
+        do {
+            $r0_2 = $r0 * 2;
+            $r1_2 = $r1 * 2;
+            $r2_2 = $r2 * 2;
+            $r3_2 = $r3 * 2;
+            $r4_2 = $r4 * 2;
+            $r5_2 = $r5 * 2;
+            $r7_2 = $r7 * 2;
+
+            $r6_19 = $r6 * 19;
+            $r7_38 = $r7 * 38;
+            $r8_19 = $r8 * 19;
+            $r9_38 = $r9 * 38;
+
+            $s0 = ($r0   * $r0) + ($r5 * $r5 * 38) + ($r6_19 * $r4_2) + ($r7_38 * $r3_2) + ($r8_19 * $r2_2) + ($r9_38 * $r1_2);
+            $s1 = ($r0_2 * $r1)                    + ($r6_19 * $r5_2) + ($r7_38 * $r4  ) + ($r8_19 * $r3_2) + ($r9_38 * $r2  );
+            $s2 = ($r0_2 * $r2) + ($r1_2 * $r1)    + ($r6_19 * $r6  ) + ($r7_38 * $r5_2) + ($r8_19 * $r4_2) + ($r9_38 * $r3_2);
+            $s3 = ($r0_2 * $r3) + ($r1_2 * $r2)                       + ($r7_38 * $r6  ) + ($r8_19 * $r5_2) + ($r9_38 * $r4  );
+            $s4 = ($r0_2 * $r4) + ($r1_2 * $r3_2) + ($r2   * $r2)     + ($r7_38 * $r7  ) + ($r8_19 * $r6*2) + ($r9_38 * $r5_2);
+            $s5 = ($r0_2 * $r5) + ($r1_2 * $r4  ) + ($r2_2 * $r3)                        + ($r8_19 * $r7_2) + ($r9_38 * $r6  );
+            $s6 = ($r0_2 * $r6) + ($r1_2 * $r5_2) + ($r2_2 * $r4) + ($r3_2 * $r3)        + ($r8_19 * $r8  ) + ($r9_38 * $r7_2);
+            $s7 = ($r0_2 * $r7) + ($r1_2 * $r6  ) + ($r2_2 * $r5) + ($r3_2 * $r4  )                         + ($r9_38 * $r8  );
+            $s8 = ($r0_2 * $r8) + ($r1_2 * $r7_2) + ($r2_2 * $r6) + ($r3_2 * $r5_2) + ($r4 * $r4  )         + ($r9_38 * $r9  );
+            $s9 = ($r0_2 * $r9) + ($r1_2 * $r8  ) + ($r2_2 * $r7) + ($r3_2 * $r6  ) + ($r4 * $r5_2);
+
+            $r0 = ($c = $s0             ) & 0x3ffffff;
+            $r1 = ($c = $s1 + ($c >> 26)) & 0x1ffffff;
+            $r2 = ($c = $s2 + ($c >> 25)) & 0x3ffffff;
+            $r3 = ($c = $s3 + ($c >> 26)) & 0x1ffffff;
+            $r4 = ($c = $s4 + ($c >> 25)) & 0x3ffffff;
+            $r5 = ($c = $s5 + ($c >> 26)) & 0x1ffffff;
+            $r6 = ($c = $s6 + ($c >> 25)) & 0x3ffffff;
+            $r7 = ($c = $s7 + ($c >> 26)) & 0x1ffffff;
+            $r8 = ($c = $s8 + ($c >> 25)) & 0x3ffffff;
+            $r9 = ($c = $s9 + ($c >> 26)) & 0x1ffffff;
+
+            $r0 += ($c = 19 * ($c >> 25)) & 0x3ffffff;
+            $r1 +=            ($c >> 26);
+        } while (--$n);
+
+        return [$r0, $r1, $r2, $r3, $r4, $r5, $r6, $r7, $r8, $r9];
     }
 
-    function scalarmult(array $f, array $c)
-    {
-        $x1 = $c;
-        $a = $this->dbl($x1, $this->one);
-        $q = [$x1, $this->one];
+    function mul121665($in) {
+        $r = [
+            ($c = $in[0] * 121665             ) & 0x3ffffff,
+            ($c = $in[1] * 121665 + ($c >> 26)) & 0x1ffffff,
+            ($c = $in[2] * 121665 + ($c >> 25)) & 0x3ffffff,
+            ($c = $in[3] * 121665 + ($c >> 26)) & 0x1ffffff,
+            ($c = $in[4] * 121665 + ($c >> 25)) & 0x3ffffff,
+            ($c = $in[5] * 121665 + ($c >> 26)) & 0x1ffffff,
+            ($c = $in[6] * 121665 + ($c >> 25)) & 0x3ffffff,
+            ($c = $in[7] * 121665 + ($c >> 26)) & 0x1ffffff,
+            ($c = $in[8] * 121665 + ($c >> 25)) & 0x3ffffff,
+            ($c = $in[9] * 121665 + ($c >> 26)) & 0x1ffffff,
+        ];
 
-        $n = 0xff;
+        $r[0] += 19 * ($c >> 25);
 
-        while ($f[$n >> 4] >> ($n & 0xf) & 1 === 0) {
-            $n--;
+        return $r;
+    }
 
-            if ($n < 0) {
-                return $this->zero;
-            }
+    function scalarmult($f, $c) {
+        $t = $this->one;
+        $u = $this->zero;
+        $v = $this->one;
+        $w = $c;
+
+        $swapBit = 1;
+
+        $i = 254;
+        while ($i --> 2) {
+            $x = $this->add($w, $v);
+            $v = $this->sub($w, $v);
+            $y = $this->add($t, $u);
+            $u = $this->sub($t, $u);
+            $t = $this->mul($y, $v);
+            $u = $this->mul($x, $u);
+            $z = $this->add($t, $u);
+            $u = $this->sqr($this->sub($t, $u));
+            $t = $this->sqr($z);
+            $u = $this->mul($u, $c);
+            $x = $this->sqr($x);
+            $v = $this->sqr($v);
+            $w = $this->mul($x, $v);
+            $v = $this->sub($x, $v);
+
+            $v = $this->mul($v, $this->add($this->mul121665($v), $x));
+
+            $b = ($f[$i >> 3] >> ($i & 7)) & 1;
+            $swap = $b ^ $swapBit;
+            list($w, $t) = [[$w, $t], [$t, $w]][$swap];
+            list($v, $u) = [[$v, $u], [$u, $v]][$swap];
+            $swapBit = $b;
         }
-        $n--;
 
-        $aq = [$a, $q];
-
-        while ($n >= 0) {
-            $b = $f[$n >> 4] >> ($n & 0xf) & 1;
-            $r = $this->sum($aq[0][0], $aq[0][1], $aq[1][0], $aq[1][1], $x1);
-            $s = $this->dbl($aq[1 - $b][0], $aq[1 - $b][1]);
-            $aq[1 - $b] = $s;
-            $aq[    $b] = $r;
-            $n--;
+        $i = 3;
+        while ($i--) {
+            $x = $this->sqr($this->add($w, $v));
+            $v = $this->sqr($this->sub($w, $v));
+            $w = $this->mul($x, $v);
+            $v = $this->sub($x, $v);
+            $v = $this->mul($v, $this->add($this->mul121665($v), $x));
         }
-        $q = $aq[1];
 
-        $q[1] = $this->inv($q[1]);
-        $q[0] = $this->mul($q[0], $q[1]);
-        return $this->reduce($q[0]);
+        $a = $this->sqr($v);
+        $b = $this->mul($this->sqr($a, 2), $v);
+        $a = $this->mul($b, $a);
+        $b = $this->mul($this->sqr($a), $b);
+        $b = $this->mul($this->sqr($b, 5), $b);
+        $c = $this->mul($this->sqr($b, 10), $b);
+        $b = $this->mul($this->sqr($this->mul($this->sqr($c, 20), $c), 10), $b);
+        $c = $this->mul($this->sqr($b, 50), $b);
+
+        $r = $this->mul($w, $this->mul($this->sqr($this->mul($this->sqr($this->mul($this->sqr($c, 100), $c), 50), $b), 5), $a));
+
+        $r = [
+            ($c = $r[0] + 0x4000000             ) & 0x3ffffff,
+            ($c = $r[1] + 0x1ffffff + ($c >> 26)) & 0x1ffffff,
+            ($c = $r[2] + 0x3ffffff + ($c >> 25)) & 0x3ffffff,
+            ($c = $r[3] + 0x1ffffff + ($c >> 26)) & 0x1ffffff,
+            ($c = $r[4] + 0x3ffffff + ($c >> 25)) & 0x3ffffff,
+            ($c = $r[5] + 0x1ffffff + ($c >> 26)) & 0x1ffffff,
+            ($c = $r[6] + 0x3ffffff + ($c >> 25)) & 0x3ffffff,
+            ($c = $r[7] + 0x1ffffff + ($c >> 26)) & 0x1ffffff,
+            ($c = $r[8] + 0x3ffffff + ($c >> 25)) & 0x3ffffff,
+            ($c = $r[9] + 0x1ffffff + ($c >> 26)) & 0x1ffffff
+        ];
+
+        return pack('V8',
+             $r[0]        | ($r[1] << 26),
+            ($r[1] >>  6) | ($r[2] << 19),
+            ($r[2] >> 13) | ($r[3] << 13),
+            ($r[3] >> 19) | ($r[4] <<  6),
+             $r[5]        | ($r[6] << 25),
+            ($r[6] >>  7) | ($r[7] << 19),
+            ($r[7] >> 13) | ($r[8] << 12),
+            ($r[8] >> 20) | ($r[9] <<  6)
+        );
     }
 
-    function clamp(array &$secret)
+    function clamp($secret)
     {
-        $secret[0] &= 0xfff8;
-        $secret[15] = ($secret[15] & 0x7fff) | 0x4000;
+        $e = array_values(unpack('C32', $secret));
+
+        $e[0]  &= 0xf8;
+        $e[31] &= 0x7f;
+        $e[31] |= 0x40;
+
+        return $e;
     }
 
     function getPublic($secret)
@@ -284,13 +232,7 @@ class Curve25519
             throw new InvalidArgumentException('Secret must be a 32 byte string');
         }
 
-        $n = array_values(unpack('v16', $secret));
-
-        $this->clamp($n);
-
-        $q = $this->scalarmult($n, $this->nine);
-
-        return pack('v16', $q[0], $q[1], $q[2], $q[3], $q[4], $q[5], $q[6], $q[7], $q[8], $q[9], $q[10], $q[11], $q[12], $q[13], $q[14], $q[15]);
+        return $this->scalarmult($this->clamp($secret), $this->nine);
     }
 
     function getShared($secret, $public)
@@ -303,14 +245,22 @@ class Curve25519
             throw new InvalidArgumentException('Public must be a 32 byte string');
         }
 
-        $n = array_values(unpack('v16', $secret));
-        $p = array_values(unpack('v16', $public));
+        $w = unpack('V8', $public);
 
-        $this->clamp($n);
+        $r = [
+              $w[1]                         & 0x3ffffff, // 26
+            (($w[1] >> 26) | ($w[2] <<  6)) & 0x1ffffff, // 25 - 51
+            (($w[2] >> 19) | ($w[3] << 13)) & 0x3ffffff, // 26 - 77
+            (($w[3] >> 13) | ($w[4] << 19)) & 0x1ffffff, // 25 - 102
+             ($w[4] >>  6)                  & 0x3ffffff, // 26 - 128
+              $w[5]                         & 0x1ffffff, // 25 - 153
+            (($w[5] >> 25) | ($w[6] <<  7)) & 0x3ffffff, // 26 - 179
+            (($w[6] >> 19) | ($w[7] << 13)) & 0x1ffffff, // 25 - 204
+            (($w[7] >> 12) | ($w[8] << 20)) & 0x3ffffff, // 26 - 230
+             ($w[8] >> 6)                   & 0x1ffffff, // 25 - 255
+        ];
 
-        $q = $this->scalarmult($n, $p);
-
-        return pack('v16', $q[0], $q[1], $q[2], $q[3], $q[4], $q[5], $q[6], $q[7], $q[8], $q[9], $q[10], $q[11], $q[12], $q[13], $q[14], $q[15]);
+        return $this->scalarmult($this->clamp($secret), $r);
     }
 }
 
