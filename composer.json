@@ -1,14 +1,32 @@
 {
-    "name": "lt/PHP-Curve25519",
-    "homepage": "https://github.com/lt/PHP-Curve25519",
-    "description": "Pure PHP implementation of Curve25519.",
-    "require": {
-        "php": "~5.4"
-    },
-    "require-dev": {
-        "phpunit/phpunit": "~4.0"
-    },
-    "autoload": {
-        "classmap": ["lib/Curve25519.php"]
+  "name": "leigh/curve25519",
+  "homepage": "https://github.com/lt/PHP-Curve25519",
+  "description": "Pure PHP implementation of the Curve25519 Diffie-Hellman function",
+  "authors": [
+    {
+        "name": "Leigh T",
+        "homepage": "https://github.com/lt"
     }
+  ],
+  "keywords": [
+    "elliptic",
+    "ecdh",
+    "security"
+  ],
+  "license": "MIT",
+  "require": {
+    "php": ">=5.4"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~4.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Curve25519\\": "lib"
+    },
+    "files": [
+      "lib/functions.php"
+    ]
+  }
 }
+

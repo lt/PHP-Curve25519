@@ -1,5 +1,7 @@
 <?php
 
+namespace Curve25519;
+
 class Curve25519
 {
     private $zero = [0,0,0,0, 0,0,0,0, 0,0];
@@ -164,9 +166,8 @@ class Curve25519
             $v = $this->mul($v, $this->add($this->mul121665($v), $x));
 
             $b = ($f[$i >> 3] >> ($i & 7)) & 1;
-            $swap = $b ^ $swapBit;
-            list($w, $t) = [[$w, $t], [$t, $w]][$swap];
-            list($v, $u) = [[$v, $u], [$u, $v]][$swap];
+            // Constant time (i.e. branchless) swap.
+            list($w, $t, $v, $u) = [[$w, $t, $v, $u], [$t, $w, $u, $v]][$b ^ $swapBit];
             $swapBit = $b;
         }
 
@@ -226,23 +227,23 @@ class Curve25519
         return $e;
     }
 
-    function getPublic($secret)
+    function publicKey($secret)
     {
         if (!is_string($secret) || strlen($secret) !== 32) {
-            throw new InvalidArgumentException('Secret must be a 32 byte string');
+            throw new \InvalidArgumentException('Secret must be a 32 byte string');
         }
 
         return $this->scalarmult($this->clamp($secret), $this->nine);
     }
 
-    function getShared($secret, $public)
+    function sharedKey($secret, $public)
     {
         if (!is_string($secret) || strlen($secret) !== 32) {
-            throw new InvalidArgumentException('Secret must be a 32 byte string');
+            throw new \InvalidArgumentException('Secret must be a 32 byte string');
         }
 
         if (!is_string($public) || strlen($public) !== 32) {
-            throw new InvalidArgumentException('Public must be a 32 byte string');
+            throw new \InvalidArgumentException('Public must be a 32 byte string');
         }
 
         $w = unpack('V8', $public);
@@ -261,17 +262,5 @@ class Curve25519
         ];
 
         return $this->scalarmult($this->clamp($secret), $r);
-    }
-}
-
-if (!function_exists('curve25519_public')) {
-    function curve25519_public($secret)
-    {
-        return (new Curve25519)->getPublic($secret);
-    }
-
-    function curve25519_shared($secret, $public)
-    {
-        return (new Curve25519)->getShared($secret, $public);
     }
 }
